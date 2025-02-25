@@ -26,14 +26,16 @@ async function uploadBasic() {
   const {GoogleAuth} = require('google-auth-library');
   const {google} = require('googleapis');
 
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v2', auth});
   const fileMetadata = {
-    'title': 'photo.jpg',
+    title: 'photo.jpg',
   };
   const media = {
     mimeType: 'image/jpeg',
-    body: fs.createReadStream('photo.jpg'),
+    body: fs.createReadStream('files/photo.jpg'),
   };
   try {
     const file = await service.files.insert({
@@ -42,6 +44,7 @@ async function uploadBasic() {
       fields: 'id',
     });
     console.log('File Id:', file.data.id);
+    return file.data.id;
   } catch (err) {
     // TODO(developer) - Handle error
     throw err;
@@ -49,4 +52,4 @@ async function uploadBasic() {
 }
 // [END drive_upload_basic]
 
-uploadBasic();
+module.exports = uploadBasic;

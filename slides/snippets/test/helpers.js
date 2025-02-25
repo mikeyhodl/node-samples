@@ -1,6 +1,5 @@
 /**
- * @license
- * Copyright Google Inc.
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Promise = require('promise');
 const {google} = require('googleapis');
 const {GoogleAuth} = require('google-auth-library');
 
@@ -26,14 +24,13 @@ class Helpers {
    * Creates the Google API Service
    */
   constructor() {
-    const auth = new GoogleAuth(
-        {
-          scopes: [
-            'https://www.googleapis.com/auth/drive',
-            'https://www.googleapis.com/auth/presentations',
-            'https://www.googleapis.com/auth/spreadsheets',
-          ],
-        });
+    const auth = new GoogleAuth({
+      scopes: [
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/presentations',
+        'https://www.googleapis.com/auth/spreadsheets',
+      ],
+    });
     this.driveService = google.drive({version: 'v3', auth});
     this.slidesService = google.slides({version: 'v1', auth});
     this.sheetsService = google.sheets({version: 'v4', auth});
@@ -60,24 +57,23 @@ class Helpers {
    * @return {Promise} returns a list of promises
    */
   cleanup() {
-    return Promise.all(this.filesToDelete.map((fileId) =>
-      this.driveService.files.delete({fileId})));
+    return Promise.all(
+        this.filesToDelete.map((fileId) =>
+          this.driveService.files.delete({fileId}),
+        ),
+    );
   }
 
   /**
    * Creates an empty presentation.
    * @return {Promise<string>} A promise to return the presentation ID.
    */
-  createTestPresentation() {
-    return new Promise((resolve, reject) => {
-      this.slidesService.presentations.create({
-        title: 'Test Preso',
-      }, (err, presentation) => {
-        if (err) return reject(err);
-        this.deleteFileOnCleanup(presentation.data.presentationId);
-        resolve(presentation.data.presentationId);
-      });
+  async createTestPresentation() {
+    const res = await this.slidesService.presentations.create({
+      title: 'Test Preso',
     });
+    this.deleteFileOnCleanup(res.data.presentationId);
+    return res.data.presentationId;
   }
 
   /**
@@ -87,31 +83,27 @@ class Helpers {
    * @param {object}   predefinedLayout The slides' predefined layout
    * @return {Promise<string[]>} A list of slide ids.
    */
-  addSlides(presentationId, num, predefinedLayout) {
-    return new Promise((resolve, reject) => {
-      const requests = [];
-      const slideIds = [];
-      for (let i = 0; i < num; ++i) {
-        slideIds.push(`slide_${i}`);
-        requests.push({
-          createSlide: {
-            objectId: slideIds[i],
-            slideLayoutReference: {
-              predefinedLayout,
-            },
+  async addSlides(presentationId, num, predefinedLayout) {
+    const requests = [];
+    const slideIds = [];
+    for (let i = 0; i < num; ++i) {
+      slideIds.push(`slide_${i}`);
+      requests.push({
+        createSlide: {
+          objectId: slideIds[i],
+          slideLayoutReference: {
+            predefinedLayout,
           },
-        });
-      }
-      this.slidesService.presentations.batchUpdate({
-        presentationId,
-        resource: {
-          requests,
         },
-      }, (err, response) => {
-        if (err) return reject(err);
-        resolve(slideIds);
       });
+    }
+    await this.slidesService.presentations.batchUpdate({
+      presentationId,
+      resource: {
+        requests,
+      },
     });
+    return slideIds;
   }
 
   /**
@@ -120,14 +112,14 @@ class Helpers {
    * @param  {string}   pageObjectId   The element page object ID.
    * @return {Promise<string>} The textbox's object ID.
    */
-  createTestTextbox(presentationId, pageObjectId) {
-    return new Promise((resolve, reject) => {
-      const boxId = 'MyTextBox_01';
-      const pt350 = {
-        magnitude: 350,
-        unit: 'PT',
-      };
-      const requests = [{
+  async createTestTextbox(presentationId, pageObjectId) {
+    const boxId = 'MyTextBox_01';
+    const pt350 = {
+      magnitude: 350,
+      unit: 'PT',
+    };
+    const requests = [
+      {
         createShape: {
           objectId: boxId,
           shapeType: 'TEXT_BOX',
@@ -146,23 +138,22 @@ class Helpers {
             },
           },
         },
-      }, {
+      },
+      {
         insertText: {
           objectId: boxId,
           insertionIndex: 0,
           text: 'New Box Text Inserted',
         },
-      }];
-      this.slidesService.presentations.batchUpdate({
-        presentationId,
-        resource: {
-          requests,
-        },
-      }, (err, createTextboxResponse) => {
-        if (err) return reject(err);
-        resolve(createTextboxResponse.data.replies[0].createShape.objectId);
-      });
+      },
+    ];
+    const res = await this.slidesService.presentations.batchUpdate({
+      presentationId,
+      resource: {
+        requests,
+      },
     });
+    return res.data.replies[0].createShape.objectId;
   }
 
   /**
@@ -173,14 +164,19 @@ class Helpers {
    * @param  {string}   sheetChartId   The Sheet's Chart ID
    * @return {Promise<string>} The chart's object ID
    */
-  createTestSheetsChart(presentationId, pageId, spreadsheetId, sheetChartId) {
-    return new Promise((resolve, reject) => {
-      const chartId = 'MyChart_01';
-      const emu4M = {
-        magnitude: 4000000,
-        unit: 'EMU',
-      };
-      const requests = [{
+  async createTestSheetsChart(
+      presentationId,
+      pageId,
+      spreadsheetId,
+      sheetChartId,
+  ) {
+    const chartId = 'MyChart_01';
+    const emu4M = {
+      magnitude: 4000000,
+      unit: 'EMU',
+    };
+    const requests = [
+      {
         createSheetsChart: {
           objectId: chartId,
           spreadsheetId: spreadsheetId,
@@ -201,39 +197,34 @@ class Helpers {
             },
           },
         },
-      }];
+      },
+    ];
 
-      this.slidesService.presentations.batchUpdate({
-        presentationId,
-        resource: {
-          requests,
-        },
-      }, (err, createSheetsChartResponse) => {
-        if (err) return reject(err);
-        resolve(createSheetsChartResponse.data.replies[0].createSheetsChart.objectId);
-      });
+    const res = await this.slidesService.presentations.batchUpdate({
+      presentationId,
+      resource: {
+        requests,
+      },
     });
+    return res.data.replies[0].createSheetsChart.objectId;
   }
 
   /**
    * Creates a test Spreadsheet.
    * @return {Promise} A promise to return the Google API service.
    */
-  createTestSpreadsheet() {
-    const createSpreadsheet = Promise.denodeify(this.sheetsService.spreadsheets.create)
-        .bind(this.sheetsService.spreadsheets);
-    return createSpreadsheet({
+  async createTestSpreadsheet() {
+    const res = await this.sheetsService.spreadsheets.create({
       resource: {
         properties: {
           title: 'Test Spreadsheet',
         },
       },
       fields: 'spreadsheetId',
-    })
-        .then((spreadsheet) => {
-          this.deleteFileOnCleanup(spreadsheet.data.spreadsheetId);
-          return spreadsheet.data.spreadsheetId;
-        });
+    });
+
+    this.deleteFileOnCleanup(res.data.spreadsheetId);
+    return res.data.spreadsheetId;
   }
 
   /**
@@ -241,32 +232,32 @@ class Helpers {
    * @param {string} spreadsheetId The spreadsheet ID.
    * @return {Promise} A promise to return the Google API service.
    */
-  populateValues(spreadsheetId) {
-    const batchUpdate = Promise.denodeify(this.sheetsService.spreadsheets.batchUpdate)
-        .bind(this.sheetsService.spreadsheets);
-    return batchUpdate({
+  async populateValues(spreadsheetId) {
+    await this.sheetsService.spreadsheets.batchUpdate({
       spreadsheetId,
       resource: {
-        requests: [{
-          repeatCell: {
-            range: {
-              sheetId: 0,
-              startRowIndex: 0,
-              endRowIndex: 15,
-              startColumnIndex: 0,
-              endColumnIndex: 15,
-            },
-            cell: {
-              userEnteredValue: {
-                stringValue: 'Hello',
+        requests: [
+          {
+            repeatCell: {
+              range: {
+                sheetId: 0,
+                startRowIndex: 0,
+                endRowIndex: 15,
+                startColumnIndex: 0,
+                endColumnIndex: 15,
               },
+              cell: {
+                userEnteredValue: {
+                  stringValue: 'Hello',
+                },
+              },
+              fields: 'userEnteredValue',
             },
-            fields: 'userEnteredValue',
           },
-        }],
+        ],
       },
-    })
-        .then(() => spreadsheetId);
+    });
+    return spreadsheetId;
   }
 }
 

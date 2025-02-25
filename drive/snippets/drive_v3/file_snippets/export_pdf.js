@@ -26,7 +26,9 @@ async function exportPdf(fileId) {
 
   // Get credentials and build service
   // TODO (developer) - Use appropriate auth mechanism for your app
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v3', auth});
 
   try {
@@ -44,6 +46,3 @@ async function exportPdf(fileId) {
 // [END drive_export_pdf]
 
 module.exports = exportPdf;
-if (module === require.main) {
-  exportPdf('1Kyer5fA4cKIJC5sBG-gXLZvx-tXl0kAkt5bZ1nmvZ6c');
-}

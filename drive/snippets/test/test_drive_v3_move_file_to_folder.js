@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const expect = require('expect');
+const {expect} = require('expect');
 const Helpers = require('./helpers');
 const createFolder = require('../drive_v3/file_snippets/create_folder');
 const moveFileToFolder = require('../drive_v3/file_snippets/move_file_to_folder');
@@ -30,11 +30,11 @@ describe('Drive snippets', () => {
     return helpers.cleanup();
   });
 
-  it('should move a file', (async () => {
+  it('should move a file', async () => {
     const folderId = await createFolder();
     const file = await helpers.createTestBlob();
     helpers.deleteFileOnCleanup(folderId);
     const movedFileStatus = await moveFileToFolder(file.data.id, folderId);
     expect(movedFileStatus).toEqual(200);
-  }));
+  });
 });

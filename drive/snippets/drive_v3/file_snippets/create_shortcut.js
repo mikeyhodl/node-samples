@@ -26,16 +26,18 @@ async function createShortcut() {
   const {GoogleAuth} = require('google-auth-library');
   const {google} = require('googleapis');
 
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v3', auth});
   const fileMetadata = {
-    'title': 'Project plan',
-    'mimeType': 'application/vnd.google-apps.drive-sdk',
+    name: 'Project plan',
+    mimeType: 'application/vnd.google-apps.drive-sdk',
   };
 
   try {
     const file = await service.files.create({
-      resource: fileMetadata,
+      requestBody: fileMetadata,
       fields: 'id',
     });
     console.log('File Id:', file.data.id);
@@ -48,4 +50,3 @@ async function createShortcut() {
 // [END drive_create_shortcut]
 
 module.exports = createShortcut;
-// createShortcut();

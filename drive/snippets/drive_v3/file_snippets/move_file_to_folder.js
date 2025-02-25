@@ -27,7 +27,9 @@ async function moveFileToFolder(fileId, folderId) {
 
   // Get credentials and build service
   // TODO (developer) - Use appropriate auth mechanism for your app
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v3', auth});
 
   try {
@@ -38,9 +40,8 @@ async function moveFileToFolder(fileId, folderId) {
     });
 
     // Move the file to the new folder
-    const previousParents = file.data.parents.map(function(parent) {
-      return parent.id;
-    }).join(',');
+    const previousParents = file.data.parents
+        .join(',');
     const files = await service.files.update({
       fileId: fileId,
       addParents: folderId,
@@ -57,7 +58,3 @@ async function moveFileToFolder(fileId, folderId) {
 // [END drive_move_file_to_folder]
 
 module.exports = moveFileToFolder;
-if (module === require.main) {
-  moveFileToFolder('1dUiRSoAQKkM3a4nTPeNQWgiuau1KdQ_l',
-      '1OLuK07-PTY7yYlur84stjtnyez2jRrjE');
-}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const expect = require('expect');
+const {expect} = require('expect');
 const Helpers = require('./helpers');
 const fetchStartPageToken = require('../drive_v3/change_snippets/fetch_start_page_token');
 
@@ -25,8 +25,8 @@ describe('Drive snippets', () => {
     return helpers.cleanup();
   });
 
-  it('should fetch the start page token', (async () => {
+  it('should fetch the start page token', async () => {
     const token = await fetchStartPageToken();
-    expect(token).toExist();
-  }));
+    expect(token).toBeDefined();
+  });
 });

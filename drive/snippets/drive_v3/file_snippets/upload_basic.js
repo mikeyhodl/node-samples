@@ -26,10 +26,13 @@ async function uploadBasic() {
 
   // Get credentials and build service
   // TODO (developer) - Use appropriate auth mechanism for your app
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v3', auth});
-  const fileMetadata = {
-    'title': 'photo.jpg',
+  const requestBody = {
+    name: 'photo.jpg',
+    fields: 'id',
   };
   const media = {
     mimeType: 'image/jpeg',
@@ -37,9 +40,8 @@ async function uploadBasic() {
   };
   try {
     const file = await service.files.create({
-      resource: fileMetadata,
+      requestBody,
       media: media,
-      fields: 'id',
     });
     console.log('File Id:', file.data.id);
     return file.data.id;
@@ -51,6 +53,3 @@ async function uploadBasic() {
 // [END drive_upload_basic]
 
 module.exports = uploadBasic;
-if (module === require.main) {
-  uploadBasic();
-}

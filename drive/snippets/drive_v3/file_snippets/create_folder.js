@@ -26,15 +26,17 @@ async function createFolder() {
   const {GoogleAuth} = require('google-auth-library');
   const {google} = require('googleapis');
 
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v3', auth});
   const fileMetadata = {
-    'title': 'Invoices',
-    'mimeType': 'application/vnd.google-apps.folder',
+    name: 'Invoices',
+    mimeType: 'application/vnd.google-apps.folder',
   };
   try {
     const file = await service.files.create({
-      resource: fileMetadata,
+      requestBody: fileMetadata,
       fields: 'id',
     });
     console.log('Folder Id:', file.data.id);
@@ -47,4 +49,3 @@ async function createFolder() {
 // [END drive_create_folder]
 
 module.exports = createFolder;
-createFolder();

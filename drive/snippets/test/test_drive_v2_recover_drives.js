@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const expect = require('expect');
+const {expect} = require('expect');
 const Helpers = require('./helpers');
 const recoverDrives = require('../drive_v2/drive_snippets/recover_drives');
 const createDrive = require('../drive_v2/drive_snippets/create_drive');
@@ -28,11 +28,11 @@ describe('Drive snippets', () => {
 
   // Note, you must enable creating Team Drives for your service account.
   // https://support.google.com/a/answer/7337635?hl=en
-  it('should recover team drives', (async () => {
+  it('should recover team drives', async () => {
     await createOrphanedTeamDrive();
     const teamDrives = await recoverDrives('soheil@workspacesamples.dev');
-    expect(teamDrives.length).toExist();
-  }));
+    expect(teamDrives.length).toBeDefined();
+  });
 
   /**
    * Creates a standalone Team Drive.
@@ -53,5 +53,5 @@ describe('Drive snippets', () => {
       });
     });
     return fileId;
-  };
+  }
 });

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const expect = require('expect');
+const {expect} = require('expect');
 const Helpers = require('./helpers');
 const SlidesSimpleTextReplace = require('../slides_simple_text_replace');
 
@@ -24,13 +24,16 @@ describe('Presentation snippets', () => {
     return helpers.cleanup();
   });
 
-  it('should SimpleTextReplace', (async () => {
+  it('should SimpleTextReplace', async () => {
     const presentationId = await helpers.createTestPresentation();
     const pageIds = await helpers.addSlides(presentationId, 1, 'BLANK');
     const pageId = pageIds[0];
     const boxId = await helpers.createTestTextbox(presentationId, pageId);
-    const response = await SlidesSimpleTextReplace.simpleTextReplace(presentationId, boxId,
-        'MY NEW TEXT');
+    const response = await SlidesSimpleTextReplace.simpleTextReplace(
+        presentationId,
+        boxId,
+        'MY NEW TEXT',
+    );
     expect(2).toEqual(response.replies.length);
-  }));
+  });
 });

@@ -25,11 +25,13 @@ async function uploadWithConversion() {
   const {google} = require('googleapis');
   // Get credentials and build service
   // TODO (developer) - Use appropriate auth mechanism for your app
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v3', auth});
   const fileMetadata = {
-    'title': 'My Report',
-    'mimeType': 'application/vnd.google-apps.spreadsheet',
+    name: 'My Report',
+    mimeType: 'application/vnd.google-apps.spreadsheet',
   };
   const media = {
     mimeType: 'text/csv',
@@ -38,7 +40,7 @@ async function uploadWithConversion() {
 
   try {
     const file = await service.files.create({
-      resource: fileMetadata,
+      requestBody: fileMetadata,
       media: media,
       fields: 'id',
     });
@@ -52,6 +54,3 @@ async function uploadWithConversion() {
 // [END drive_upload_with_conversion]
 
 module.exports = uploadWithConversion;
-if (module === require.main) {
-  uploadWithConversion();
-}

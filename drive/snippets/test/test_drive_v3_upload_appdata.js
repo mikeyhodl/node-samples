@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const expect = require('expect');
+const {expect} = require('expect');
 const Helpers = require('./helpers');
 const uploadAppdata = require('../drive_v3/appdata_snippets/upload_appdata');
 
@@ -25,9 +25,9 @@ describe('Drive snippets', () => {
     return helpers.cleanup();
   });
 
-  it('should upload a file', (async () => {
-    const id = await uploadAppdata();
-    expect(id).toExist();
+  it('should upload a file', async () => {
+    const id = await uploadAppdata('../files/config.json');
+    expect(id).toBeDefined();
     helpers.deleteFileOnCleanup(id);
-  }));
+  });
 });

@@ -25,7 +25,9 @@ async function searchFile() {
   const {GoogleAuth} = require('google-auth-library');
   const {google} = require('googleapis');
 
-  const auth = new GoogleAuth({scopes: 'https://www.googleapis.com/auth/drive'});
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/drive',
+  });
   const service = google.drive({version: 'v2', auth});
   const files = [];
   const pageToken = null;
@@ -40,10 +42,11 @@ async function searchFile() {
     res.data.items.forEach(function(file) {
       console.log('Found file:', file.title, file.id);
     });
+    return res.data.items;
   } catch (err) {
     throw err;
   }
 }
 // [END drive_search_file]
 
-searchFile();
+module.exports = searchFile;

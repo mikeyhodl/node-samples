@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const expect = require('expect');
+const {expect} = require('expect');
 const Helpers = require('./helpers');
 const SheetsConditionalFormatting = require('../sheets_conditional_formatting');
 
@@ -25,10 +25,12 @@ describe('Spreadsheet conditional formatting snippet', () => {
     return helpers.cleanup();
   });
 
-  it('should conditionally format', (async () => {
+  it('should conditionally format', async () => {
     const spreadsheetId = await helpers.createTestSpreadsheet();
     await helpers.populateValues(spreadsheetId);
-    const result = await SheetsConditionalFormatting.conditionalFormatting(spreadsheetId);
+    const result = await SheetsConditionalFormatting.conditionalFormatting(
+        spreadsheetId,
+    );
     expect(result.data.replies.length).toBe(2);
-  }));
+  });
 });
